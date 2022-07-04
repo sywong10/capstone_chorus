@@ -16,4 +16,4 @@ Flask-WTF
 Babel
 python-dateutil
 Flask-Migrate
-
+dotenv
