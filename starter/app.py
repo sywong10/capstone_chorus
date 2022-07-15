@@ -266,7 +266,7 @@ def create_app(test_config=None):
         for i in get_choir_name:
             print(i)
 
-        return('lets see')
+        return('test')
 
     return app
 
