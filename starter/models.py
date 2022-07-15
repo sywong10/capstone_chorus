@@ -26,19 +26,12 @@ class Singer(db.Model):
     not_available = db.Column(db.String(), nullable=False)
     enrollment = db.relationship('ChoirEnrollment', backref='singer', lazy=True)
 
-    # def __init__(self, name, phone, voice_part, not_available):
-    #     self.name = name
-    #     self.phone = phone
-    #     self.voice_part = voice_part
-    #     self.not_available = not_available
-
     def short(self):
         return {
             'id': self.id,
             'name': self.name,
             'voice_part': self.voice_part
         }
-
 
     def long(self):
         return {
@@ -53,19 +46,46 @@ class Singer(db.Model):
         db.session.add(self)
         db.session.commit()
 
+    def update(self):
+        db.session.commit()
+
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
 
     def __repr__(self):
         return json.dumps(self.short())
 
-
-
 class Choir(db.Model):
     __tablename__ = 'choir'
-
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(), nullable=True)
     practice_time = db.Column(db.String(), nullable=True)
     enrollment = db.relationship('ChoirEnrollment', backref='choir', lazy=True)
+
+    def long(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'practice time': self.practice_time
+        }
+
+    def insert(self):
+        db.session.add(self)
+        db.session.commit()
+
+    def update(self):
+        db.session.commit()
+
+
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
+
+
+
+    def __repr__(self):
+        return json.dumps(self.long())
 
 
 
