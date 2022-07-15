@@ -261,7 +261,7 @@ def create_app(test_config=None):
         get_choir_name = Choir.query.join(ChoirEnrollment, ChoirEnrollment.choir_id==cid)
         # get_singers = Singer.query.join(ChoirEnrollment, ChoirEnrollment.choir_id == cid)
 
-        print(get_choir_name)
+        # print(get_choir_name)
 
         for i in get_choir_name:
             print(i)
