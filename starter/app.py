@@ -6,6 +6,45 @@ from models import setup_db, db, Singer, Choir, ChoirEnrollment
 # from models import setup_db, db
 
 
+def sort_by_voice_part(singers):
+    SOPRANO = []
+    ALTO = []
+    TENOR = []
+    BASS = []
+
+    for i in singers:
+        # print('{}, {}'.format(i.name, i.voice_part))
+        if i.voice_part == 'soprano':
+            SOPRANO.append(i)
+        elif i.voice_part == 'alto':
+            ALTO.append(i)
+        elif i.voice_part == 'tenor':
+            TENOR.append(i)
+        elif i.voice_part == 'bass':
+            BASS.append(i)
+
+    if not SOPRANO:
+        s={}
+        s['name'] = 'NONE'
+        SOPRANO.append(s)
+
+    if not ALTO:
+        a={}
+        a['name'] = 'NONE'
+        ALTO.append(a)
+
+    if not TENOR:
+        # t={}
+        t = {"name": "TBD"}
+        TENOR.append(t)
+
+    if not BASS:
+        # b={}
+        b= {name: 'TBD'}
+        BASS.append(b)
+
+    return(SOPRANO, ALTO, TENOR, BASS)
+
 
 def create_app(test_config=None):
     app = Flask(__name__)
@@ -253,20 +292,50 @@ def create_app(test_config=None):
             abort(404)
 
 
-    #  who is in which choir, pass in choir id
-    @app.route('/test/<int:cid>', methods=['GET'])
-    def test(cid):
 
-        # get_choir_name = Choir.query.filter_by(cid)
-        get_choir_name = Choir.query.join(ChoirEnrollment, ChoirEnrollment.choir_id==cid)
-        # get_singers = Singer.query.join(ChoirEnrollment, ChoirEnrollment.choir_id == cid)
 
-        # print(get_choir_name)
+     # who is in which choir, pass in choir id
+    @app.route('/choir/<int:cid>', methods=['GET'])
+    def list_singers_in_choir(cid):
 
-        for i in get_choir_name:
-            print(i)
+        selected_choir = Choir.query.filter(Choir.id == cid).one_or_none()
+        singers = Singer.query.with_entities(Singer).join(ChoirEnrollment).filter(ChoirEnrollment.choir_id == cid).all()
+        SOPRANO, ALTO, TENOR, BASS = sort_by_voice_part(singers)
 
-        return('test')
+        print('ALTO: {}'.format(ALTO))
+        print('TENOR: {}'.format(TENOR))
+
+        for t in TENOR:
+            print(t.name)
+
+
+        return jsonify({
+            'success': True,
+            'Choir name': selected_choir.name,
+            'voice_type_of_singers': {
+                'SOPRANO': [s.name for s in SOPRANO],
+                'ALTO': [a.name for a in ALTO],
+                # 'TENOR': [t.name for t in TENOR],
+                'BASS': [b.name for b in BASS]
+            }
+        }), 200
+
+
+    #  query the enrolled singers and their voice part in specific choir
+
+    @app.route('/choir/<int:cid>/<s_voice_part>', methods=['GET'])
+    def choir_id_soprano(cid, s_voice_part):
+
+        # choir_result = Singer.query.with_entities(Singer).join(ChoirEnrollment).filter(ChoirEnrollment.choir_id == cid).all()
+        choir_result = Singer.query.with_entities(Singer).join(ChoirEnrollment).filter(
+            ChoirEnrollment.choir_id == cid, Singer.voice_part == s_voice_part).all()
+
+        print('{} in choir {}:'.format(s_voice_part, cid))
+        for i in choir_result:
+            print('{}:, {}'.format(i.name, i.voice_part))
+
+
+        return('what happen')
 
     return app
 
