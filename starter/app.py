@@ -23,25 +23,25 @@ def sort_by_voice_part(singers):
         elif i.voice_part == 'bass':
             BASS.append(i)
 
-    if not SOPRANO:
-        s={}
-        s['name'] = 'NONE'
-        SOPRANO.append(s)
-
-    if not ALTO:
-        a={}
-        a['name'] = 'NONE'
-        ALTO.append(a)
-
-    if not TENOR:
-        # t={}
-        t = {"name": "TBD"}
-        TENOR.append(t)
-
-    if not BASS:
-        # b={}
-        b= {name: 'TBD'}
-        BASS.append(b)
+    # if not SOPRANO:
+    #     s={}
+    #     s['name'] = 'NONE'
+    #     SOPRANO.append(s)
+    #
+    # if not ALTO:
+    #     a={}
+    #     a['name'] = 'NONE'
+    #     ALTO.append(a)
+    #
+    # if not TENOR:
+    #     # t={}
+    #     t = {"name": "TBD"}
+    #     TENOR.append(t)
+    #
+    # if not BASS:
+    #     # b={}
+    #     b= {name: 'TBD'}
+    #     BASS.append(b)
 
     return(SOPRANO, ALTO, TENOR, BASS)
 
@@ -299,14 +299,15 @@ def create_app(test_config=None):
     def list_singers_in_choir(cid):
 
         selected_choir = Choir.query.filter(Choir.id == cid).one_or_none()
-        singers = Singer.query.with_entities(Singer).join(ChoirEnrollment).filter(ChoirEnrollment.choir_id == cid).all()
+        # singers = Singer.query.with_entities(Singer).join(ChoirEnrollment).filter(ChoirEnrollment.choir_id == cid).all()
+        singers = Singer.query.with_entities(Singer).join(ChoirEnrollment).filter(ChoirEnrollment.choir_id == cid).first()
         SOPRANO, ALTO, TENOR, BASS = sort_by_voice_part(singers)
 
-        print('ALTO: {}'.format(ALTO))
-        print('TENOR: {}'.format(TENOR))
-
-        for t in TENOR:
-            print(t.name)
+        # print('ALTO: {}'.format(ALTO))
+        # print('TENOR: {}'.format(TENOR))
+        #
+        # for t in TENOR:
+        #     print(t.name)
 
 
         return jsonify({
@@ -315,7 +316,7 @@ def create_app(test_config=None):
             'voice_type_of_singers': {
                 'SOPRANO': [s.name for s in SOPRANO],
                 'ALTO': [a.name for a in ALTO],
-                # 'TENOR': [t.name for t in TENOR],
+                'TENOR': [t.name for t in TENOR],
                 'BASS': [b.name for b in BASS]
             }
         }), 200
