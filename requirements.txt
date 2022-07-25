@@ -17,3 +17,4 @@ Babel
 python-dateutil
 Flask-Migrate
 dotenv
+python-jose

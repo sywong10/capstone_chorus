@@ -1,9 +1,9 @@
 from flask import Flask, request, jsonify, abort
-from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_cors import CORS
 from models import setup_db, db, Singer, Choir, ChoirEnrollment
-from .auth.auth import AuthError, requires_auth
+# from auth import AuthError, requires_auth
+from auth import AuthError
 
 
 def sort_by_voice_part(singers):
@@ -356,6 +356,11 @@ def create_app(test_config=None):
             "error": 404,
             "message": "resource not found"
         }), 404
+
+
+    if __name__== '__main__':
+        port = int(os.environ.get('PORT', 5000))
+        app.run(host='0.0.0.0', port=port)
 
 
     return app
