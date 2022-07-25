@@ -3,7 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_cors import CORS
 from models import setup_db, db, Singer, Choir, ChoirEnrollment
-# from models import setup_db, db
+from .auth.auth import AuthError, requires_auth
 
 
 def sort_by_voice_part(singers):
@@ -13,35 +13,14 @@ def sort_by_voice_part(singers):
     BASS = []
 
     for i in singers:
-        # print('{}, {}'.format(i.name, i.voice_part))
         if i.voice_part == 'soprano':
-            SOPRANO.append(i)
+            SOPRANO.append(i.name)
         elif i.voice_part == 'alto':
-            ALTO.append(i)
+            ALTO.append(i.name)
         elif i.voice_part == 'tenor':
-            TENOR.append(i)
+            TENOR.append(i.name)
         elif i.voice_part == 'bass':
-            BASS.append(i)
-
-    # if not SOPRANO:
-    #     s={}
-    #     s['name'] = 'NONE'
-    #     SOPRANO.append(s)
-    #
-    # if not ALTO:
-    #     a={}
-    #     a['name'] = 'NONE'
-    #     ALTO.append(a)
-    #
-    # if not TENOR:
-    #     # t={}
-    #     t = {"name": "TBD"}
-    #     TENOR.append(t)
-    #
-    # if not BASS:
-    #     # b={}
-    #     b= {name: 'TBD'}
-    #     BASS.append(b)
+            BASS.append(i.name)
 
     return(SOPRANO, ALTO, TENOR, BASS)
 
@@ -67,14 +46,20 @@ def create_app(test_config=None):
 
 
     @app.route('/singers', methods=['GET'])
+    # @requires_auth('get:singers')
     def get_singers():
 
-      singers = Singer.query.all()
+        try:
+            singers = Singer.query.all()
 
-      return jsonify({
-            'success': True,
-            'singers': [s.long() for s in singers]
-        }), 200
+            return jsonify({
+                'success': True,
+                'singers': [s.long() for s in singers]
+            }), 200
+
+        except Exception as e:
+            print(e)
+            abort(404)
 
 
     @app.route('/singers', methods=['POST'])
@@ -103,7 +88,7 @@ def create_app(test_config=None):
 
         except Exception as e:
             print(e)
-            abort(404)
+            abort(422)
 
 
     @app.route('/singers/<voice_part>', methods=['GET'])
@@ -111,11 +96,8 @@ def create_app(test_config=None):
 
         parts = ['soprano', 'alto', 'tenor', 'bass']
 
-        if voice_part in parts:
-            print('voice_part: {}'.format(voice_part))
-        else:
-            print("sorry we don't have {}".format(voice_part))
-            abort(404)
+        if not voice_part in parts:
+            abort(422)
 
         try:
             singers = Singer.query.filter(Singer.voice_part==voice_part).all()
@@ -129,8 +111,8 @@ def create_app(test_config=None):
             print(e)
             abort(404)
 
+
     @app.route('/singers/<int:id>/', methods=['GET'])
-    #
     def get_singer_type(id):
         try:
             singer = Singer.query.filter(Singer.id == id).one_or_none()
@@ -145,13 +127,33 @@ def create_app(test_config=None):
             abort(404)
 
 
+    # list singers of each voice type in the overall pool
+    # return of this function does not take enrollment into consideration
+
+    @app.route('/<voice_part>', methods=['GET'])
+    def list_singers_in_pool(voice_part):
+        try:
+            parts = ['soprano', 'alto', 'tenor', 'bass']
+            if not voice_part in parts:
+                abort(422)
+
+            singer_list = Singer.query.filter(Singer.voice_part == voice_part).all()
+
+            return jsonify({
+                'success': True,
+                'overall pool': [ s.name for s in singer_list ]
+            }), 200
+
+        except Exception as e:
+            print(e)
+
+
     @app.route('/singers/<int:id>/', methods=['PATCH'])
     def modify_singer(id):
         body = request.get_json()
         updated_singer = Singer.query.filter(Singer.id==id).one_or_none()
 
         if updated_singer is None:
-            return('id does not exist')
             abort(404)
 
         try:
@@ -177,7 +179,7 @@ def create_app(test_config=None):
 
         except Exception as e:
             print(e)
-            abort(400)
+            abort(422)
 
 
     @app.route('/singers/<int:id>/', methods=['DELETE'])
@@ -204,21 +206,22 @@ def create_app(test_config=None):
     @app.route('/choirs', methods=['GET'])
     def get_choirs():
 
-        choirs = Choir.query.all()
-        print('let see')
-        print(choirs)
+        try:
+            choirs = Choir.query.all()
 
-        return jsonify({
-            'success': True,
-            'choirs': [ choir.long() for choir in choirs ]
-        }), 200
+            return jsonify({
+                'success': True,
+                'choirs': [ choir.long() for choir in choirs ]
+            }), 200
+
+        except Exception as e:
+            abort(422)
 
 
     @app.route('/choirs', methods=['POST'])
     def add_choir():
 
         body = request.get_json()
-
         new_name = body.get("name", None)
         new_practice_time = body.get("practice_time", None)
 
@@ -239,17 +242,15 @@ def create_app(test_config=None):
 
         except Exception as e:
             print(e)
-            abort(404)
+            abort(422)
 
 
     @app.route('/choirs/<int:id>', methods=['PATCH'])
     def update_choir(id):
         body = request.get_json()
-
         updated_choir = Choir.query.filter(Choir.id==id).one_or_none()
 
         if updated_choir is None:
-            return('id does not exist')
             abort(404)
 
         try:
@@ -268,7 +269,8 @@ def create_app(test_config=None):
 
         except Exception as e:
             print(e)
-            abort(404)
+            abort(422)
+
 
     @app.route('/choirs/<int:id>', methods=['DELETE'])
     def delete_choir(id):
@@ -276,8 +278,8 @@ def create_app(test_config=None):
         delete_choir = Choir.query.filter(Choir.id==id).one_or_none()
 
         if not delete_choir:
-            return('id does not exist')
             abort(404)
+
 
         try:
             delete_choir.delete()
@@ -289,7 +291,7 @@ def create_app(test_config=None):
 
         except Exception as e:
             print(e)
-            abort(404)
+            abort(422)
 
 
 
@@ -298,45 +300,63 @@ def create_app(test_config=None):
     @app.route('/choir/<int:cid>', methods=['GET'])
     def list_singers_in_choir(cid):
 
-        selected_choir = Choir.query.filter(Choir.id == cid).one_or_none()
-        # singers = Singer.query.with_entities(Singer).join(ChoirEnrollment).filter(ChoirEnrollment.choir_id == cid).all()
-        singers = Singer.query.with_entities(Singer).join(ChoirEnrollment).filter(ChoirEnrollment.choir_id == cid).first()
-        SOPRANO, ALTO, TENOR, BASS = sort_by_voice_part(singers)
+        try:
+            selected_choir = Choir.query.filter(Choir.id == cid).one_or_none()
+            singers = Singer.query.with_entities(Singer).join(ChoirEnrollment).filter(ChoirEnrollment.choir_id == cid).all()
+            SOPRANO, ALTO, TENOR, BASS = sort_by_voice_part(singers)
 
-        # print('ALTO: {}'.format(ALTO))
-        # print('TENOR: {}'.format(TENOR))
-        #
-        # for t in TENOR:
-        #     print(t.name)
+            return jsonify({
+                'success': True,
+                'Choir name': selected_choir.name,
+                'voice_type': {
+                    'SOPRANO': (None, SOPRANO)[len(SOPRANO) > 0],
+                    'ALTO': (None, SOPRANO)[len(ALTO) > 0],
+                    'TENOR': (None, TENOR)[len(TENOR) > 0],
+                    'BASS': (None, BASS)[len(BASS) > 0]
+                }
+            }), 200
 
-
-        return jsonify({
-            'success': True,
-            'Choir name': selected_choir.name,
-            'voice_type_of_singers': {
-                'SOPRANO': [s.name for s in SOPRANO],
-                'ALTO': [a.name for a in ALTO],
-                'TENOR': [t.name for t in TENOR],
-                'BASS': [b.name for b in BASS]
-            }
-        }), 200
+        except Exception as e:
+            print(e)
+            abort(404)
 
 
     #  query the enrolled singers and their voice part in specific choir
-
     @app.route('/choir/<int:cid>/<s_voice_part>', methods=['GET'])
     def choir_id_soprano(cid, s_voice_part):
 
-        # choir_result = Singer.query.with_entities(Singer).join(ChoirEnrollment).filter(ChoirEnrollment.choir_id == cid).all()
-        choir_result = Singer.query.with_entities(Singer).join(ChoirEnrollment).filter(
-            ChoirEnrollment.choir_id == cid, Singer.voice_part == s_voice_part).all()
+        try:
+            selected_choir = Choir.query.filter(Choir.id == cid).one_or_none()
+            choir_part_result = Singer.query.with_entities(Singer).join(ChoirEnrollment).filter(
+                ChoirEnrollment.choir_id == cid, Singer.voice_part == s_voice_part).all()
 
-        print('{} in choir {}:'.format(s_voice_part, cid))
-        for i in choir_result:
-            print('{}:, {}'.format(i.name, i.voice_part))
+            return jsonify({
+                'success': True,
+                'Choir name': selected_choir.name,
+                s_voice_part: [p.name for p in choir_part_result]
+            }), 200
+
+        except Exception as e:
+            print(e)
+            abort(404)
 
 
-        return('what happen')
+    @app.errorhandler(422)
+    def unprocessable_entity(error):
+        return jsonify({
+            "success": False,
+            "error": 422,
+            "message": "unprocessable_entity"
+        }), 422
+
+    @app.errorhandler(404)
+    def not_found(error):
+        return jsonify({
+            "success": False,
+            "error": 404,
+            "message": "resource not found"
+        }), 404
+
 
     return app
 
