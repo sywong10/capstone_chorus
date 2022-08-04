@@ -96,3 +96,11 @@ class ChoirEnrollment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     choir_id = db.Column(db.Integer, db.ForeignKey('choir.id'), nullable=False)
     singer_id = db.Column(db.Integer, db.ForeignKey('singer.id'), nullable=False)
+
+    def enroll(self):
+        db.session.add(self)
+        db.session.commit()
+
+    def unenroll(self):
+        db.session.delete(self)
+        db.session.commit()
