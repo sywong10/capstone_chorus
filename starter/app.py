@@ -357,12 +357,14 @@ def create_app(test_config=None):
         print('singer id: {}'.format(sid))
 
         choir = Choir.query.filter(Choir.name.ilike('%' + choir_name + '%')).first()
+        singer = Singer.query.filter(Singer.id == sid).one_or_none()
+
         # choir.id
         # sid
 
         enrollment = ChoirEnrollment(
             choir_id=choir.id,
-            singer_id=sid,
+            singer_id=singer.id,
         )
 
         db.session.add(ChoirEnrollment)
