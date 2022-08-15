@@ -19,8 +19,8 @@ def get_token_auth_header():
     """Obtains the Access Token from the Authorization Header
     """
     auth = request.headers.get('Authorization', None)
-    print('auth')
-    print(auth)
+    # print('auth')
+    # print(auth)
 
 
     if not auth:
@@ -170,3 +170,5 @@ def requires_auth(permission=''):
 
         return wrapper
     return requires_auth_decorator
+
+

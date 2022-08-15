@@ -3,9 +3,19 @@ from flask_migrate import Migrate
 from flask_cors import CORS
 from models import setup_db, db, Singer, Choir, ChoirEnrollment
 from auth import AuthError, requires_auth
-# from auth2 import AuthError, requires_auth
 
-# print(__name__, get_token_auth_header)
+NUMBER_PER_PAGE = 3
+
+def pagination(request, selection):
+    # print(type(selection))
+    # print(selection[0].name)
+    page = request.args.get('page', 1, type=int)
+    start = (page - 1) * NUMBER_PER_PAGE
+    end = page * NUMBER_PER_PAGE
+    # singers = [s.long() for s in selection]
+    current_singers = selection[start:end]
+    # current_singers = singers[start:end]
+    return current_singers
 
 
 def sort_by_voice_part(singers):
@@ -28,7 +38,7 @@ def sort_by_voice_part(singers):
 
 
 def create_app(test_config=None):
-    print(__name__)
+    # print(__name__)
     app = Flask(__name__)
     migrate = Migrate(app, db)
 
@@ -47,33 +57,62 @@ def create_app(test_config=None):
     def index():
         return 'hello'
 
-
+    # test completed
     @app.route('/singers', methods=['GET'])
     @requires_auth('get:singers')
-    def get_singers(jwt):
+    def get_paginated_singers(jwt):
 
-        try:
-            singers = Singer.query.all()
+        selection = Singer.query.all()
+        current_selection = pagination(request, selection)
+        singers = [s.long() for s in current_selection]
 
+        if len(singers) > 0:
             return jsonify({
                 'success': True,
-                'singers': [s.long() for s in singers]
+                'singers': singers,
+                'total singers': len(selection)
             }), 200
+        else:
+            abort(404)
 
-        except Exception as e:
-            print(e)
+    # test completed
+    @app.route('/singers/<int:singer_id>', methods=['GET'])
+    @requires_auth('get:singers')
+    def get_specific_singer(jwt, singer_id):
+
+        singer = Singer.query.filter(Singer.id == singer_id).one_or_none()
+
+        if singer:
+            return jsonify({
+                'success': True,
+                'singer': singer.long()
+            }), 200
+        else:
             abort(404)
 
 
+    # add a new singer
+    # tests completed
     @app.route('/singers', methods=['POST'])
     @requires_auth('post:singers')
     def add_singers(jwt):
         body = request.get_json()
+        parts = ['soprano', 'alto', 'tenor', 'bass']
 
         new_name = body.get('name', None)
         new_phone = body.get('phone', None)
         new_voice_part = body.get('voice_part', None)
         new_not_available = body.get('not_available', None)
+
+        check_new_singer = Singer.query.filter(Singer.name.ilike('%' + new_name + '%')).first()
+
+        # should fail if singer already exists in singer table
+        if check_new_singer:
+            abort(409)
+
+        # should fail if void part submitted is not supported
+        if not new_voice_part in parts:
+            abort(422)
 
         try:
             new_singer = Singer(
@@ -87,7 +126,7 @@ def create_app(test_config=None):
 
             return jsonify({
               'success': True,
-              'singers': new_name + ' added'
+              'singer added': new_name + ' added'
             }), 200
 
         except Exception as e:
@@ -95,6 +134,11 @@ def create_app(test_config=None):
             abort(422)
 
 
+
+    # get list of singer in specified voice part
+    # return of this function does not take enrollment into consideration
+
+    # test completed
     @app.route('/singers/<voice_part>', methods=['GET'])
     @requires_auth('get:singers')
     def get_voice_type(jwt, voice_part):
@@ -103,43 +147,20 @@ def create_app(test_config=None):
 
         if not voice_part in parts:
             abort(422)
-
-        try:
-            singers = Singer.query.filter(Singer.voice_part==voice_part).all()
+        else:
+            selection = Singer.query.filter(Singer.voice_part == voice_part).all()
+            current_selection = pagination(request, selection)
+            singers = [s.name for s in current_selection]
 
             return jsonify({
                 'success': True,
-                voice_part: [s.name for s in singers]
+                'total': len(selection),
+                voice_part: singers
             })
 
-        except Exception as e:
-            print(e)
-            abort(404)
 
 
-
-    # list singers of each voice type in the overall pool
-    # return of this function does not take enrollment into consideration
-
-    @app.route('/<voice_part>', methods=['GET'])
-    @requires_auth('get:part')
-    def list_singers_in_pool(jwt,voice_part):
-        try:
-            parts = ['soprano', 'alto', 'tenor', 'bass']
-            if not voice_part in parts:
-                abort(422)
-
-            singer_list = Singer.query.filter(Singer.voice_part == voice_part).all()
-
-            return jsonify({
-                'success': True,
-                'overall pool': [ s.name for s in singer_list ]
-            }), 200
-
-        except Exception as e:
-            print(e)
-
-
+    # test completed
     @app.route('/singers/<int:id>', methods=['PATCH'])
     @requires_auth('patch:singers')
     def modify_singer(jwt, id):
@@ -148,8 +169,7 @@ def create_app(test_config=None):
 
         if updated_singer is None:
             abort(404)
-
-        try:
+        else:
             if not body.get("name", None) is None:
                 updated_singer.name = body.get("name")
 
@@ -170,11 +190,9 @@ def create_app(test_config=None):
             }), 200
 
 
-        except Exception as e:
-            print(e)
-            abort(422)
 
 
+    # test completed
     @app.route('/singers/<int:id>', methods=['DELETE'])
     @requires_auth('delete:singers')
     def delete_singer(jwt, id):
@@ -187,7 +205,7 @@ def create_app(test_config=None):
 
         try:
             if not unenroll_singer:
-                print('this singer is not enrolled,  proceed to delete from singer table')
+                # print('this singer is not enrolled,  proceed to delete from singer table')
                 delete_singer.delete()
             else:
                 print('the singer is enrolled, need to unenroll first, then delete from singer table')
@@ -205,6 +223,7 @@ def create_app(test_config=None):
 
 
 
+    # test completed
     @app.route('/choirs', methods=['GET'])
     @requires_auth('get:choirs')
     def get_choirs(jwt):
@@ -221,6 +240,7 @@ def create_app(test_config=None):
             abort(422)
 
 
+
     @app.route('/choirs', methods=['POST'])
     @requires_auth('post:choirs')
     def add_choir(jwt):
@@ -228,8 +248,6 @@ def create_app(test_config=None):
         body = request.get_json()
         new_name = body.get("name", None)
         new_practice_time = body.get("practice_time", None)
-
-        print('new_practice_time: {}'.format(new_practice_time))
 
         try:
             new_choir = Choir(
@@ -353,28 +371,29 @@ def create_app(test_config=None):
     @requires_auth('post:enroll_singer')
     def enroll_singer_to_choir(jwt, choir_name, sid):
 
-        print('choir_name: {}'.format(choir_name))
-        print('singer id: {}'.format(sid))
-
         choir = Choir.query.filter(Choir.name.ilike('%' + choir_name + '%')).first()
         singer = Singer.query.filter(Singer.id == sid).one_or_none()
+        print('days singer not available: {}'.format(singer.not_available.split()))
+        print('choir practice time: {}'.format(choir.practice_time))
 
-        # choir.id
-        # sid
+        if choir.practice_time.split(' ')[0].lower() in singer.not_available.lower():
+            print('there is a conflict')
+            abort(409)
+        else:
+            print('there is no conflict, good to go')
+            enrollment = ChoirEnrollment(
+                choir_id=choir.id,
+                singer_id=singer.id,
+            )
 
-        enrollment = ChoirEnrollment(
-            choir_id=choir.id,
-            singer_id=singer.id,
-        )
+            enrollment.enroll()
 
-        db.session.add(ChoirEnrollment)
+            return jsonify({
+            'success': True,
+            'singer added': singer.name,
+            'updated choir': choir.name,
+            }), 200
 
-
-        print('choir_id: {}'.format(choir.id))
-        print('choir_name: {}'.format(choir.name))
-
-
-        return('the end')
 
 
 
@@ -388,6 +407,15 @@ def create_app(test_config=None):
             "error": 401,
             "message": "unauthorized"
         }), 401
+
+
+    @app.errorhandler(403)
+    def not_found(error):
+        return jsonify({
+            "success": False,
+            "error": 403,
+            "message": "unauthorized"
+        }), 403
 
 
     @app.errorhandler(422)
@@ -406,6 +434,14 @@ def create_app(test_config=None):
             "message": "resource not found"
         }), 404
 
+
+    @app.errorhandler(409)
+    def schedule_conflict(error):
+        return jsonify({
+            "success": False,
+            "error": 409,
+            "message": "schedule conflict"
+        }), 409
 
     return app
 
