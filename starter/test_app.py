@@ -3,8 +3,9 @@ import unittest
 import json
 from flask_sqlalchemy import SQLAlchemy
 from app import create_app
-from models import setup_db, Singer, Choir, ChoirEnrollment
+from models import setup_db, db, Singer, Choir, ChoirEnrollment
 from settings import TEST_DB_NAME, TEST_DB_USER, TEST_DB_PASSWORD, SINGER_TOKEN, DIRECTOR_TOKEN
+
 
 
 class ChoirTestCase(unittest.TestCase):
@@ -44,7 +45,7 @@ class ChoirTestCase(unittest.TestCase):
             'name': 'Tracy Jordan',
             'phone': '683-811-9521',
             'voice_part': 'baritone',
-            'not_available': 'Tuesday'
+            'not_available': 'Monday'
         }
 
         self.new_choir = {
@@ -204,13 +205,106 @@ class ChoirTestCase(unittest.TestCase):
     #     self.assertTrue((data['choir added']))
 
 
-    def test_add_choir(self):
+
+    def test_rbac_403_add_choir(self):
         res = self.client.post('/choirs', headers=self.headers_singer, json=self.new_choir)
+        data = json.loads(res.data)
+        # print('data: {}'.format(data))
+
+        self.assertEqual(res.status_code, 403)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], "you are unauthorized")
+
+
+
+
+    # def test_update_choir(self):
+    #     res = self.client.patch('/choirs/4', headers=self.headers_director, json={"name": "new name"})
+    #     data =json.loads(res.data)
+    #
+    #     self.assertEqual(res.status_code, 200)
+    #     self.assertEqual(data['success'], True)
+    #     self.assertTrue(data['updated choir'])
+
+
+
+    def test_rbac_403_update_choir(self):
+        res = self.client.patch('/choirs/4', headers=self.headers_singer, json={"name": "another name"})
         data = json.loads(res.data)
 
         self.assertEqual(res.status_code, 403)
-        self.assertEqual(data['code'], "unauthorized")
-        self.assertEqual(data['description'], "you are unauthorized")
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], "you are unauthorized")
+
+
+    # def test_delete_choir(self):
+    #     res = self.client.delete('/choirs/5', headers=self.headers_director)
+    #     data = json.loads(res.data)
+    #
+    #     self.assertEqual(res.status_code, 200)
+    #     self.assertEqual(data['success'], True)
+    #     self.assertTrue(data['removed choir'])
+
+
+    # def test_404_delete_choir(self):
+    #     res = self.client.delete('/choirs/10', headers=self.headers_director)
+    #     data = json.loads(res.data)
+    #
+    #     self.assertEqual(res.status_code, 404)
+    #     self.assertEqual(data['success'], False)
+    #     self.assertEqual(data['message'], "resource not found")
+
+
+    def test_get_choir_info(self):
+        res = self.client.get('/choir/1', headers=self.headers_director)
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['success'], True)
+        self.assertTrue(data['Choir name'])
+        self.assertTrue(data['voice_type'])
+
+
+
+    def test_404_get_choir_info(self):
+        res = self.client.get('/choir/10', headers=self.headers_director)
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 404)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], "resource not found")
+
+
+    def test_null_singer_enroll_to_choir(self):
+        res = self.client.post('/enroll/3/30', headers=self.headers_director)
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 404)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], "resource not found")
+
+
+    def test_409_singer_enroll_to_choir_schedule_conflict(self):
+        res = self.client.post('/enroll/hudson/18', headers=self.headers_director)
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 409)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], "schedule conflict")
+
+
+    def test_singer_enroll_to_choir(self):
+        res = self.client.post('enroll/mercer/18', headers=self.headers_director)
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['success'], True)
+        self.assertTrue(data['singer added'])
+        self.assertTrue(data['updated choir'])
+
+
+
+
 
 
 

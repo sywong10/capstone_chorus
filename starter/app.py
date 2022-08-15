@@ -240,7 +240,7 @@ def create_app(test_config=None):
             abort(422)
 
 
-
+    # test is completed
     @app.route('/choirs', methods=['POST'])
     @requires_auth('post:choirs')
     def add_choir(jwt):
@@ -266,7 +266,7 @@ def create_app(test_config=None):
             print(e)
             abort(422)
 
-
+    # test is completed
     @app.route('/choirs/<int:id>', methods=['PATCH'])
     @requires_auth('patch:choirs')
     def update_choir(jwt, id):
@@ -295,6 +295,8 @@ def create_app(test_config=None):
             abort(422)
 
 
+
+    # test is completed
     @app.route('/choirs/<int:id>', methods=['DELETE'])
     @requires_auth('delete:choirs')
     def delete_choir(jwt, id):
@@ -303,33 +305,30 @@ def create_app(test_config=None):
 
         if not delete_choir:
             abort(404)
-
-
-        try:
+        else:
             delete_choir.delete()
-
             return jsonify({
                 'success': True,
                 'removed choir': delete_choir.long()
             }), 200
 
-        except Exception as e:
-            print(e)
-            abort(422)
 
 
 
 
+     # test is completed
      # who is in which choir, pass in choir id
     @app.route('/choir/<int:cid>', methods=['GET'])
     @requires_auth('get:choirs')
     def list_singers_in_choir(jwt, cid):
 
-        try:
-            selected_choir = Choir.query.filter(Choir.id == cid).one_or_none()
-            singers = Singer.query.with_entities(Singer).join(ChoirEnrollment).filter(ChoirEnrollment.choir_id == cid).all()
-            SOPRANO, ALTO, TENOR, BASS = sort_by_voice_part(singers)
+        selected_choir = Choir.query.filter(Choir.id == cid).one_or_none()
+        singers = Singer.query.with_entities(Singer).join(ChoirEnrollment).filter(ChoirEnrollment.choir_id == cid).all()
+        SOPRANO, ALTO, TENOR, BASS = sort_by_voice_part(singers)
 
+        if not selected_choir:
+            abort(404)
+        else:
             return jsonify({
                 'success': True,
                 'Choir name': selected_choir.name,
@@ -341,11 +340,9 @@ def create_app(test_config=None):
                 }
             }), 200
 
-        except Exception as e:
-            print(e)
-            abort(404)
 
 
+    # test completed
     #  query the enrolled singers and their voice part in specific choir
     @app.route('/choir/<int:cid>/<s_voice_part>', methods=['GET'])
     @requires_auth('get:choirs')
@@ -367,20 +364,29 @@ def create_app(test_config=None):
             abort(404)
 
 
+
+
     @app.route('/enroll/<choir_name>/<int:sid>', methods=['POST'])
     @requires_auth('post:enroll_singer')
     def enroll_singer_to_choir(jwt, choir_name, sid):
 
         choir = Choir.query.filter(Choir.name.ilike('%' + choir_name + '%')).first()
         singer = Singer.query.filter(Singer.id == sid).one_or_none()
-        print('days singer not available: {}'.format(singer.not_available.split()))
-        print('choir practice time: {}'.format(choir.practice_time))
+
+        if not singer:
+            abort(404)
+
+        # print('days singer not available: {}'.format(singer.not_available.split()))
+        # print('choir practice time: {}'.format(choir.practice_time))
+
 
         if choir.practice_time.split(' ')[0].lower() in singer.not_available.lower():
-            print('there is a conflict')
+            # print('there is a conflict')
             abort(409)
+
         else:
             print('there is no conflict, good to go')
+
             enrollment = ChoirEnrollment(
                 choir_id=choir.id,
                 singer_id=singer.id,
@@ -409,13 +415,13 @@ def create_app(test_config=None):
         }), 401
 
 
-    @app.errorhandler(403)
-    def not_found(error):
-        return jsonify({
-            "success": False,
-            "error": 403,
-            "message": "unauthorized"
-        }), 403
+    # @app.errorhandler(403)
+    # def not_found(error):
+    #     return jsonify({
+    #         "success": False,
+    #         "error": 403,
+    #         "message": "unauthorized"
+    #     }), 403
 
 
     @app.errorhandler(422)
@@ -442,6 +448,15 @@ def create_app(test_config=None):
             "error": 409,
             "message": "schedule conflict"
         }), 409
+
+
+    @app.errorhandler(AuthError)
+    def auth_error(error):
+        return jsonify({
+            "success": False,
+            "error": error.status_code,
+            "message": error.error['description']
+        }), error.status_code
 
     return app
 
