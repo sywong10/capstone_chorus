@@ -1,15 +1,73 @@
 
+============
+
+Capstone - Chorus project
+
+============
+
+The Capstone - Chorus project is a final project of Full Stack Web Developer Nanodegree of Udacity.
+
+* Chorus project is an application to help singers in nearby counties to let choral directors know their availability.
+Singers can register themselves to a local registry with information of their voice part, their availability for rehersal days and phone number for communication.
+
+* Choral directories can use this information to assemble their choral groups per singers' voice parts and rehearsal availability.
+
+
+
+===========
+
+Models
+
+==========
+
+singer table with colums name, phone, voice_part, not_available
+choir table with columns name and practice_time
+
+enrollment table with enrollment_id, choir_id and singer_id
+
+
+============
+
+Endpoints
+
+===========
+
+* GET /singers, /singers/<int:singer_id>, /singers/<voice_part>, /choirs, /choir/<int:cid>, /choir/<int:cid>/<s_voice_part>,
+* PATCH /singers/<int:id>, /choirs/<int:id>,
+* POST /singers, /choirs, /enroll/<choir_name>/<int:sid>,
+* DELETE singers/<int:id>, /choirs/<int:id>
+
+
+============
+
+Roles
+
+============
+
+* singer: can register singer, unregister singer, update singer information, view list of people who have registered, list of people enrolled in each choir.
+
+* director: can do everything singer can.  Director also can enroll and unenroll a singer to a chorus according to their voice part and availability.
+
+============
+
+setup Python environment
+
+============
 
 $ cd capstone
+$ pip install -r requirements.txt
 $ source cap/bin/activate
 $ cd starter
 $ export FLASK_APP=app.py
 $ export FLASK_ENV=development
-$ flask run
+$ flask run --reload
 
 
-==============
+==================
+
 Prep for database
+
+==================
 
 1.  createdb capstone
     createdb capstone_test
@@ -33,8 +91,11 @@ Prep for database
      $ flask db migrate -m "initial migration"
 
 
-===========
+=============
+
 recreate database
+
+=============
 
 1.
 capstone=# delete from enrollment;
@@ -78,6 +139,12 @@ capstone=#
      $ flask db migrate -m "initial migration"
 
 
+===============
+
+curl example to some endpoints
+
+===============
+
 
 list singer information for signers in first page
 $ curl http://localhost:5000/singers -H "Accept: application/json" -H "Authorization: Bearer $singer_token"
@@ -91,7 +158,17 @@ $ curl -X GET http://localhost:5000/singers/2 -H "Accept: application/json" -H "
 list singer name in specified voice part (alto)
 $ curl -X GET http://localhost:5000/singers/alto -H "Accept: application/json" -H "Authorization: Bearer $singer_token"
 
-add a new singer
+
+
+===============
+
+API Reference
+
+===============
+
+
+
+
 
 
 

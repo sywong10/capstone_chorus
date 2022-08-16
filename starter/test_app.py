@@ -48,6 +48,13 @@ class ChoirTestCase(unittest.TestCase):
             'not_available': 'Monday'
         }
 
+        self.new_singer4 = {
+            'name': 'Kenneth Parcell',
+            'phone': '593-831-5521',
+            'voice_part': 'tenor',
+            'not_available': 'Tuesday'
+        }
+
         self.new_choir = {
             'name': 'Somerset',
             'practice_time': 'Monday 7 pm'
@@ -67,9 +74,6 @@ class ChoirTestCase(unittest.TestCase):
     def test_get_paginated_singers(self):
         res= self.client.get('/singers', headers=self.headers_director)
         data = json.loads(res.data)
-        # print('data: {}'.format(data))
-        # print('res: {}'.format(res))
-        # print(res.status_code)
 
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
@@ -95,6 +99,35 @@ class ChoirTestCase(unittest.TestCase):
         self.assertEqual(data['success'], True)
         self.assertTrue(data['singer'])
 
+
+
+    def test_add_a_singer(self):
+        res = self.client.post('/singers', headers=self.headers_singer, json=self.new_singer)
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['success'], True)
+        self.assertTrue(data['singer added'])
+
+
+    def test_add_a_singer(self):
+        res = self.client.post('/singers', headers=self.headers_singer, json=self.new_singer2)
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['success'], True)
+        self.assertTrue(data['singer added'])
+
+    def test_add_a_singer(self):
+        res = self.client.post('/singers', headers=self.headers_singer, json=self.new_singer4)
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['success'], True)
+        self.assertTrue(data['singer added'])
+
+
+
     def test_404_get_singer_by_id(self):
         res = self.client.get('singers/200', headers=self.headers_director)
         data = json.loads(res.data)
@@ -104,49 +137,27 @@ class ChoirTestCase(unittest.TestCase):
         self.assertEqual(data['message'], 'resource not found')
 
 
-    # def test_delete_a_singer(self):
-    #     res = self.client.delete('/singers/16', headers=self.headers_director)
-    #     data = json.loads(res.data)
-    #
-    #     self.assertEqual(res.status_code, 200)
-    #     self.assertTrue(data['deleted singer'])
+
+    def test_delete_a_singer(self):
+        res = self.client.delete('/singers/16', headers=self.headers_director)
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 200)
+        self.assertTrue(data['deleted singer'])
 
 
-    # delete a singer who does not exist
-    # def test_404_delete_a_singer(self):
-    #     res = self.client.delete('singers/16', headers=self.headers_director)
-    #     data = json.loads(res.data)
-    #
-    #     self.assertEqual(res.status_code, 404)
-    #     self.assertEqual(data['success'], False)
-    #     self.assertEqual(data['message'], 'resource not found')
 
 
-    # def test_add_a_singer(self):
-    #     res = self.client.post('/singers', headers=self.headers_singer, json=self.new_singer)
-    #     data = json.loads(res.data)
-    #
-    #     self.assertEqual(res.status_code, 200)
-    #     self.assertEqual(data['success'], True)
-    #     self.assertTrue(data['singer added'])
 
 
-    # def test_409_add_a_singer(self):
-    #     res = self.client.post('/singers', headers=self.headers_singer, json=self.new_singer)
-    #     data = json.loads(res.data)
-    #
-    #     self.assertEqual(res.status_code, 409)
-    #     self.assertEqual(data['success'], False)
-    #     self.assertEqual(data['message'], "schedule conflict")
 
+    def test_409_add_an_incorrect_voice_part(self):
+        res = self.client.post('/singers', headers=self.headers_singer, json=self.new_singer3)
+        data = json.loads(res.data)
 
-    # def test_409_add_an_incorrect_voice_part(self):
-    #     res = self.client.post('/singers', headers=self.headers_singer, json=self.new_singer3)
-    #     data = json.loads(res.data)
-    #
-    #     self.assertEqual(res.status_code, 422)
-    #     self.assertEqual(data['success'], False)
-    #     self.assertEqual(data['message'], "unprocessable_entity")
+        self.assertEqual(res.status_code, 422)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], "unprocessable_entity")
 
 
     def test_singers_voice_part(self):
@@ -167,7 +178,7 @@ class ChoirTestCase(unittest.TestCase):
         self.assertEqual(data['message'], "unprocessable_entity")
 
 
-    # update singer information, ie, change not_available to Friday
+    # # # update singer information, ie, change not_available to Friday
     def test_singers_update(self):
         res = self.client.patch('/singers/17', headers=self.headers_singer, json={"not_available": "Monday"})
         data = json.loads(res.data)
@@ -186,6 +197,26 @@ class ChoirTestCase(unittest.TestCase):
         self.assertEqual(data['message'], "resource not found")
 
 
+    def test_409_add_a_duplicate_singer(self):
+        res = self.client.post('/singers', headers=self.headers_singer, json=self.new_singer)
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 409)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], "schedule conflict")
+
+    #
+    # # # # delete a singer who does not exist
+    def test_404_delete_a_singer(self):
+        res = self.client.delete('singers/16', headers=self.headers_director)
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 404)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], 'resource not found')
+
+
+
     def test_get_choirs(self):
         res = self.client.get('/choirs', headers=self.headers_singer)
         data = json.loads(res.data)
@@ -195,36 +226,32 @@ class ChoirTestCase(unittest.TestCase):
         self.assertTrue(data['choirs'])
 
 
+    def test_add_choir(self):
+        res = self.client.post('/choirs', headers=self.headers_director, json=self.new_choir)
+        data = json.loads(res.data)
 
-    # def test_add_choir(self):
-    #     res = self.client.post('/choirs', headers=self.headers_director, json=self.new_choir)
-    #     data = json.loads(res.data)
-    #
-    #     self.assertEqual(res.status_code, 200)
-    #     self.assertEqual(data['success'], True)
-    #     self.assertTrue((data['choir added']))
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['success'], True)
+        self.assertTrue((data['choir added']))
 
 
 
     def test_rbac_403_add_choir(self):
         res = self.client.post('/choirs', headers=self.headers_singer, json=self.new_choir)
         data = json.loads(res.data)
-        # print('data: {}'.format(data))
 
         self.assertEqual(res.status_code, 403)
         self.assertEqual(data['success'], False)
         self.assertEqual(data['message'], "you are unauthorized")
 
 
+    def test_update_choir(self):
+        res = self.client.patch('/choirs/4', headers=self.headers_director, json={"name": "new name"})
+        data =json.loads(res.data)
 
-
-    # def test_update_choir(self):
-    #     res = self.client.patch('/choirs/4', headers=self.headers_director, json={"name": "new name"})
-    #     data =json.loads(res.data)
-    #
-    #     self.assertEqual(res.status_code, 200)
-    #     self.assertEqual(data['success'], True)
-    #     self.assertTrue(data['updated choir'])
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['success'], True)
+        self.assertTrue(data['updated choir'])
 
 
 
@@ -237,22 +264,22 @@ class ChoirTestCase(unittest.TestCase):
         self.assertEqual(data['message'], "you are unauthorized")
 
 
-    # def test_delete_choir(self):
-    #     res = self.client.delete('/choirs/5', headers=self.headers_director)
-    #     data = json.loads(res.data)
-    #
-    #     self.assertEqual(res.status_code, 200)
-    #     self.assertEqual(data['success'], True)
-    #     self.assertTrue(data['removed choir'])
+    def test_delete_choir(self):
+        res = self.client.delete('/choirs/4', headers=self.headers_director)
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['success'], True)
+        self.assertTrue(data['removed choir'])
 
 
-    # def test_404_delete_choir(self):
-    #     res = self.client.delete('/choirs/10', headers=self.headers_director)
-    #     data = json.loads(res.data)
-    #
-    #     self.assertEqual(res.status_code, 404)
-    #     self.assertEqual(data['success'], False)
-    #     self.assertEqual(data['message'], "resource not found")
+    def test_404_delete_choir(self):
+        res = self.client.delete('/choirs/10', headers=self.headers_director)
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 404)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], "resource not found")
 
 
     def test_get_choir_info(self):
@@ -294,7 +321,7 @@ class ChoirTestCase(unittest.TestCase):
 
 
     def test_singer_enroll_to_choir(self):
-        res = self.client.post('enroll/mercer/18', headers=self.headers_director)
+        res = self.client.post('enroll/mercer/19', headers=self.headers_director)
         data = json.loads(res.data)
 
         self.assertEqual(res.status_code, 200)

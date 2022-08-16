@@ -208,7 +208,7 @@ def create_app(test_config=None):
                 # print('this singer is not enrolled,  proceed to delete from singer table')
                 delete_singer.delete()
             else:
-                print('the singer is enrolled, need to unenroll first, then delete from singer table')
+                # print('the singer is enrolled, need to unenroll first, then delete from singer table')
                 unenroll_singer.unenroll()
                 delete_singer.delete()
 
@@ -248,6 +248,11 @@ def create_app(test_config=None):
         body = request.get_json()
         new_name = body.get("name", None)
         new_practice_time = body.get("practice_time", None)
+
+        check_new_choir = Choir.query.filter(Choir.name.ilike('%' + new_name + '%')).first()
+
+        if check_new_choir:
+            abort(409)
 
         try:
             new_choir = Choir(
@@ -293,6 +298,7 @@ def create_app(test_config=None):
         except Exception as e:
             print(e)
             abort(422)
+
 
 
 
@@ -385,7 +391,7 @@ def create_app(test_config=None):
             abort(409)
 
         else:
-            print('there is no conflict, good to go')
+            # print('there is no conflict, good to go')
 
             enrollment = ChoirEnrollment(
                 choir_id=choir.id,
