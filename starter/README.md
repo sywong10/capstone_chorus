@@ -30,8 +30,8 @@ enrollment table with enrollment_id, choir_id and singer_id
 
 
 **PATCH** <br />
-  /singers/<int:id> <br /> 
-  /choirs/<int:id> <br />
+  &nbsp;&nbsp;/singers/<int:id> <br /> 
+  &nbsp;&nbsp;/choirs/<int:id> <br />
 
 **POST** <br />
   /singers <br /> 
