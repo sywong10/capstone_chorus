@@ -155,8 +155,9 @@ $ curl -X GET http://localhost:5000/singers/alto -H "Accept: application/json" -
 409 - schedule conflict <br>
 422 - unprocessable_entity <br>
 
+==================
 
-**API endpoints**
+**API endpoints** <br>
 http://localhost:5000 <br>
 
 
