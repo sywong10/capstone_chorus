@@ -53,9 +53,9 @@ def create_app(test_config=None):
         return response
 
 
-    @app.route('/')
-    def index():
-        return 'hello'
+    # @app.route('/')
+    # def index():
+    #     return 'hello'
 
     # test completed
     @app.route('/singers', methods=['GET'])
@@ -409,25 +409,6 @@ def create_app(test_config=None):
 
 
 
-
-
-
-    @app.errorhandler(401)
-    def not_found(error):
-        return jsonify({
-            "success": False,
-            "error": 401,
-            "message": "unauthorized"
-        }), 401
-
-
-    # @app.errorhandler(403)
-    # def not_found(error):
-    #     return jsonify({
-    #         "success": False,
-    #         "error": 403,
-    #         "message": "unauthorized"
-    #     }), 403
 
 
     @app.errorhandler(422)

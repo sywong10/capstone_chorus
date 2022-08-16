@@ -1,7 +1,7 @@
 
 ============
 
-Capstone - Chorus project
+**Capstone - Chorus project**
 
 ============
 
@@ -16,7 +16,7 @@ Singers can register themselves to a local registry with information of their vo
 
 ===========
 
-Models
+**Models**
 
 ==========
 
@@ -28,7 +28,7 @@ enrollment table with enrollment_id, choir_id and singer_id
 
 ============
 
-Endpoints
+**Endpoints**
 
 ===========
 
@@ -40,7 +40,7 @@ Endpoints
 
 ============
 
-Roles
+**Roles**
 
 ============
 
@@ -50,7 +50,7 @@ Roles
 
 ============
 
-setup Python environment
+**setup Python environment**
 
 ============
 
@@ -65,7 +65,7 @@ $ flask run --reload
 
 ==================
 
-Prep for database
+**Prep for database**
 
 ==================
 
@@ -93,7 +93,7 @@ Prep for database
 
 =============
 
-recreate database
+**recreate database**
 
 =============
 
@@ -141,7 +141,7 @@ capstone=#
 
 ===============
 
-curl example to some endpoints
+**curl example to some endpoints**
 
 ===============
 
@@ -159,12 +159,31 @@ list singer name in specified voice part (alto)
 $ curl -X GET http://localhost:5000/singers/alto -H "Accept: application/json" -H "Authorization: Bearer $singer_token"
 
 
+==============
+
+**Error Code**
+
+==============
+
+401 - authorization header, token issue
+403 - not authorized
+404 - resource not found
+409 - schedule conflict
+422 - unprocessable_entity
+
+
 
 ===============
 
-API Reference
+**API endpoints**
+
+http://localhost:5000
 
 ===============
+
+
+**GET /singers**
+
 
 
 
