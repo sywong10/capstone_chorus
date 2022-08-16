@@ -21,26 +21,26 @@ enrollment table with enrollment_id, choir_id and singer_id
 **Endpoints**
 
 **GET** <br />
-  /singers  <br />
-  /singers/<int:singer_id> <br /> 
-  /singers/<voice_part> <br /> 
-  /choirs <br /> 
-  /choir/<int:cid> <br /> 
-  /choir/<int:cid>/<s_voice_part> <br />
+  &nbsp;&nbsp;&nbsp;/singers  <br />
+  &nbsp;&nbsp;&nbsp;/singers/<int:singer_id> <br /> 
+  &nbsp;&nbsp;&nbsp;/singers/<voice_part> <br /> 
+  &nbsp;&nbsp;&nbsp;/choirs <br /> 
+  &nbsp;&nbsp;&nbsp;/choir/<int:cid> <br /> 
+  &nbsp;&nbsp;&nbsp;/choir/<int:cid>/<s_voice_part> <br />
 
 
 **PATCH** <br />
-  &nbsp;&nbsp;/singers/<int:id> <br /> 
-  &nbsp;&nbsp;/choirs/<int:id> <br />
+  &nbsp;&nbsp;&nbsp;/singers/<int:id> <br /> 
+  &nbsp;&nbsp;&nbsp;/choirs/<int:id> <br />
 
 **POST** <br />
-  /singers <br /> 
-  /choirs <br /> 
-  /enroll/<choir_name>/<int:sid> <br />
+  &nbsp;&nbsp;&nbsp;/singers <br /> 
+  &nbsp;&nbsp;&nbsp;/choirs <br /> 
+  &nbsp;&nbsp;&nbsp;/enroll/<choir_name>/<int:sid> <br />
 
 **DELETE** <br />
-  /singers/<int:id> <br /> 
-  /choirs/<int:id> <br />
+  &nbsp;&nbsp;&nbsp;/singers/<int:id> <br /> 
+  &nbsp;&nbsp;&nbsp;/choirs/<int:id> <br />
 
 
 **Roles** <br />
@@ -51,113 +51,113 @@ enrollment table with enrollment_id, choir_id and singer_id
 
 **setup Python environment**
 
-$ cd capstone
-$ pip install -r requirements.txt
-$ source cap/bin/activate
-$ cd starter
-$ export FLASK_APP=app.py
-$ export FLASK_ENV=development
-$ flask run --reload
+$ cd capstone <br>
+$ pip install -r requirements.txt <br>
+$ source cap/bin/activate <br>
+$ cd starter <br>
+$ export FLASK_APP=app.py <br>
+$ export FLASK_ENV=development <br>
+$ flask run --reload <br>
 
 
 **Prep for database**
 
 
-1.  createdb capstone
-    createdb capstone_test
+1.  createdb capstone <br>
+    createdb capstone_test <br>
 
-2.  flask run --reload   (this should create empty tables)
+2.  flask run --reload   (this should create empty tables) <br>
 
-3.   $ cd starter/dbscripts
-     $ psql -U postgres capstone < choir.sql
-     $ psql -U postgres capstone_test < choir.sql
-        Password for user postgres:
-        INSERT 0 1
-        INSERT 0 1
-        INSERT 0 1
+3.   $ cd starter/dbscripts <br>
+     $ psql -U postgres capstone < choir.sql <br>
+     $ psql -U postgres capstone_test < choir.sql <br>
+        Password for user postgres: <br>
+        INSERT 0 1 <br>
+        INSERT 0 1 <br>
+        INSERT 0 1 <br>
 
-    $  psql -U postgres capstone < singer.sql
-    $  psql -U postgres capstone < enrollment.sql
+    $  psql -U postgres capstone < singer.sql <br>
+    $  psql -U postgres capstone < enrollment.sql <br>
 
-4.  $ cd starter
-     $ mv migrations migration-orig
-     $ flask db init
-     $ flask db migrate -m "initial migration"
+4.  $ cd starter <br>
+     $ mv migrations migration-orig <br>
+     $ flask db init <br>
+     $ flask db migrate -m "initial migration" <br>
 
     
 
 **recreate database**
 
 1.
-capstone=# delete from enrollment;
-DELETE 17
-capstone=# select * from enrollment;
- id | choir_id | singer_id
-----+----------+-----------
-(0 rows)
+capstone=# delete from enrollment; <br>
+DELETE 17 <br>
+capstone=# select * from enrollment; <br>
+ id | choir_id | singer_id <br>
+----+----------+----------- <br>
+(0 rows) <br>
 
-capstone=#
+capstone=# <br>
 
-2.  capstone=# delete from choir;
+2.  capstone=# delete from choir; <br>
 
-3.  capstone=# delete from singer;
+3.  capstone=# delete from singer; <br>
 
-4.  stop flask
+4.  stop flask <br>
 
-5.  switch user to postgres
-    $ dropdb capstone
+5.  switch user to postgres <br>
+    $ dropdb capstone <br>
 
-6.  createdb capstone
-    createdb capstone_test
+6.  createdb capstone <br>
+    createdb capstone_test <br>
 
-7.  uncomment both forieng keys in class ChoirEnrollment
+7.  uncomment both forieng keys in class ChoirEnrollment <br>
 
-8.  flask run --reload   (this should create empty tables)
+8.  flask run --reload   (this should create empty tables) <br>
 
-9.   $ cd starter/dbscripts
-     $ psql -U postgres capstone < choir.sql
-        Password for user postgres:
-        INSERT 0 1
-        INSERT 0 1
-        INSERT 0 1
+9.   $ cd starter/dbscripts <br>
+     $ psql -U postgres capstone < choir.sql <br>
+        Password for user postgres: <br>
+        INSERT 0 1 <br>
+        INSERT 0 1 <br>
+        INSERT 0 1 <br>
 
-    $  psql -U postgres capstone < singer.sql
-    $  psql -U postgres capstone < enrollment.sql
+    $  psql -U postgres capstone < singer.sql <br>
+    $  psql -U postgres capstone < enrollment.sql <br>
 
-10.  $ cd starter
-     $ mv migrations migration-orig
-     $ flask db init
-     $ flask db migrate -m "initial migration"
+10.  $ cd starter <br>
+     $ mv migrations migration-orig <br>
+     $ flask db init <br>
+     $ flask db migrate -m "initial migration" <br>
 
      
 
 **curl example to some endpoints**
 
 
-list singer information for signers in first page
-$ curl http://localhost:5000/singers -H "Accept: application/json" -H "Authorization: Bearer $singer_token"
+list singer information for signers in first page <br>
+$ curl http://localhost:5000/singers -H "Accept: application/json" -H "Authorization: Bearer $singer_token" <br>
 
-list singer information for singers in paginated page 2
-$ curl -X GET http://localhost:5000/singers\?page\=2 -H "Accept: application/json" -H "Authorization: Bearer $singer_token
+list singer information for singers in paginated page 2 <br>
+$ curl -X GET http://localhost:5000/singers\?page\=2 -H "Accept: application/json" -H "Authorization: Bearer $singer_token <br>
 
-list singer information by singer_id = 2
-$ curl -X GET http://localhost:5000/singers/2 -H "Accept: application/json" -H "Authorization: Bearer $singer_token"
+list singer information by singer_id = 2 <br>
+$ curl -X GET http://localhost:5000/singers/2 -H "Accept: application/json" -H "Authorization: Bearer $singer_token" <br>
 
-list singer name in specified voice part (alto)
-$ curl -X GET http://localhost:5000/singers/alto -H "Accept: application/json" -H "Authorization: Bearer $singer_token"
+list singer name in specified voice part (alto) <br>
+$ curl -X GET http://localhost:5000/singers/alto -H "Accept: application/json" -H "Authorization: Bearer $singer_token" <br>
 
 
 **Error Code**
 
-401 - authorization header, token issue
-403 - not authorized
-404 - resource not found
-409 - schedule conflict
-422 - unprocessable_entity
+401 - authorization header, token issue <br>
+403 - not authorized <br>
+404 - resource not found <br>
+409 - schedule conflict <br>
+422 - unprocessable_entity <br>
 
 
 **API endpoints**
-http://localhost:5000
+http://localhost:5000 <br>
 
 
 **GET /singers**
