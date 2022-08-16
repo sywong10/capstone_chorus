@@ -20,30 +20,30 @@ enrollment table with enrollment_id, choir_id and singer_id
 
 **Endpoints**
 
-**GET** 
-  /singers, 
-  /singers/<int:singer_id>, 
-  /singers/<voice_part>, 
-  /choirs, 
-  /choir/<int:cid>, 
-  /choir/<int:cid>/<s_voice_part>,
+**GET** <br />
+  /singers  <br />
+  /singers/<int:singer_id> <br /> 
+  /singers/<voice_part> <br /> 
+  /choirs <br /> 
+  /choir/<int:cid> <br /> 
+  /choir/<int:cid>/<s_voice_part> <br />
 
 
-**PATCH** 
-  /singers/<int:id>, 
-  /choirs/<int:id>,
+**PATCH** <br />
+  /singers/<int:id> <br /> 
+  /choirs/<int:id> <br />
 
-**POST** 
-  /singers, 
-  /choirs, 
-  /enroll/<choir_name>/<int:sid>,
+**POST** <br />
+  /singers <br /> 
+  /choirs <br /> 
+  /enroll/<choir_name>/<int:sid> <br />
 
-**DELETE**
-  /singers/<int:id>, 
-  /choirs/<int:id>
+**DELETE** <br />
+  /singers/<int:id> <br /> 
+  /choirs/<int:id> <br />
 
 
-**Roles**
+**Roles** <br />
 
 * singer: can register singer, unregister singer, update singer information, view list of people who have registered, list of people enrolled in each choir.
 * director: can do everything singer can.  Director also can enroll and unenroll a singer to a chorus according to their voice part and availability.
