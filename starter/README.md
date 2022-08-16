@@ -20,7 +20,7 @@ enrollment table with enrollment_id, choir_id and singer_id
 
 **Endpoints**
 
-** GET ** 
+**GET** 
   /singers, 
   /singers/<int:singer_id>, 
   /singers/<voice_part>, 
@@ -29,16 +29,16 @@ enrollment table with enrollment_id, choir_id and singer_id
   /choir/<int:cid>/<s_voice_part>,
 
 
-** PATCH ** 
+**PATCH** 
   /singers/<int:id>, 
   /choirs/<int:id>,
 
-** POST ** 
+**POST** 
   /singers, 
   /choirs, 
   /enroll/<choir_name>/<int:sid>,
 
-** DELETE **
+**DELETE**
   /singers/<int:id>, 
   /choirs/<int:id>
 
