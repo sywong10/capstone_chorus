@@ -1,9 +1,6 @@
 
-============
-
 **Capstone - Chorus project**
 
-============
 
 The Capstone - Chorus project is a final project of Full Stack Web Developer Nanodegree of Udacity.
 
@@ -13,12 +10,7 @@ Singers can register themselves to a local registry with information of their vo
 * Choral directories can use this information to assemble their choral groups per singers' voice parts and rehearsal availability.
 
 
-
-===========
-
 **Models**
-
-==========
 
 singer table with colums name, phone, voice_part, not_available
 choir table with columns name and practice_time
@@ -26,33 +18,38 @@ choir table with columns name and practice_time
 enrollment table with enrollment_id, choir_id and singer_id
 
 
-============
-
 **Endpoints**
 
-===========
+** GET ** 
+  /singers, 
+  /singers/<int:singer_id>, 
+  /singers/<voice_part>, 
+  /choirs, 
+  /choir/<int:cid>, 
+  /choir/<int:cid>/<s_voice_part>,
 
-* GET /singers, /singers/<int:singer_id>, /singers/<voice_part>, /choirs, /choir/<int:cid>, /choir/<int:cid>/<s_voice_part>,
-* PATCH /singers/<int:id>, /choirs/<int:id>,
-* POST /singers, /choirs, /enroll/<choir_name>/<int:sid>,
-* DELETE singers/<int:id>, /choirs/<int:id>
 
+** PATCH ** 
+  /singers/<int:id>, 
+  /choirs/<int:id>,
 
-============
+** POST ** 
+  /singers, 
+  /choirs, 
+  /enroll/<choir_name>/<int:sid>,
+
+** DELETE **
+  /singers/<int:id>, 
+  /choirs/<int:id>
+
 
 **Roles**
 
-============
-
 * singer: can register singer, unregister singer, update singer information, view list of people who have registered, list of people enrolled in each choir.
-
 * director: can do everything singer can.  Director also can enroll and unenroll a singer to a chorus according to their voice part and availability.
 
-============
 
 **setup Python environment**
-
-============
 
 $ cd capstone
 $ pip install -r requirements.txt
@@ -63,11 +60,8 @@ $ export FLASK_ENV=development
 $ flask run --reload
 
 
-==================
-
 **Prep for database**
 
-==================
 
 1.  createdb capstone
     createdb capstone_test
@@ -90,12 +84,9 @@ $ flask run --reload
      $ flask db init
      $ flask db migrate -m "initial migration"
 
-
-=============
+    
 
 **recreate database**
-
-=============
 
 1.
 capstone=# delete from enrollment;
@@ -138,12 +129,9 @@ capstone=#
      $ flask db init
      $ flask db migrate -m "initial migration"
 
-
-===============
+     
 
 **curl example to some endpoints**
-
-===============
 
 
 list singer information for signers in first page
@@ -159,11 +147,7 @@ list singer name in specified voice part (alto)
 $ curl -X GET http://localhost:5000/singers/alto -H "Accept: application/json" -H "Authorization: Bearer $singer_token"
 
 
-==============
-
 **Error Code**
-
-==============
 
 401 - authorization header, token issue
 403 - not authorized
@@ -172,14 +156,8 @@ $ curl -X GET http://localhost:5000/singers/alto -H "Accept: application/json" -
 422 - unprocessable_entity
 
 
-
-===============
-
 **API endpoints**
-
 http://localhost:5000
-
-===============
 
 
 **GET /singers**
