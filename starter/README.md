@@ -161,6 +161,8 @@ $ curl -X GET http://localhost:5000/singers/alto -H "Accept: application/json" -
 http://localhost:5000 <br>
 
 
+
+
 **GET /singers**
 * fetch registered singer list 
 * need 'get:singers' permission
@@ -185,6 +187,7 @@ GET /singers
             "phone": "131-111-1111",
             "voice_part": "soprano"
         }
+      ]
 }
 ```
 
@@ -212,6 +215,7 @@ when querying incorrect voice type:
 
 GET /singers/baritone
 
+
 ```json
 {
     "error": 422,
@@ -225,6 +229,7 @@ GET /singers/baritone
 * query specific singer information
 * need 'get:singers'
 * endpoint returns singer information
+
 
 ```json
 {
