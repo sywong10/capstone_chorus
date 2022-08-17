@@ -196,9 +196,9 @@ GET /singers
 * the endpoint returns 10 singers a page.
 * query an incorrect voice type will return error 422
 
-```json
 GET /singers/soprano
 
+```json
 {
     "soprano": [
         "Leslie Knope",
@@ -208,10 +208,12 @@ GET /singers/soprano
     "success": true,
     "total": 3
 }
-
+```
+when querying incorrect voice type:
 
 GET /singers/baritone
 
+```json
 {
     "error": 422,
     "message": "unprocessable_entity",
@@ -219,6 +221,25 @@ GET /singers/baritone
 }
 
 ```
+
+***GET /singers/<int:singer_id>***
+* query specific singer information
+* need 'get:singers'
+* endpoint returns singer information
+
+```json
+{
+    "singer": {
+        "id": 2,
+        "name": "Leslie Knope",
+        "not_avilable": "Tuesday",
+        "phone": "131-111-1111",
+        "voice_part": "soprano"
+    },
+    "success": true
+}
+```
+
 
 ***PATCH /singer/<int:singer_id>***
 
@@ -233,6 +254,10 @@ example input json body
     "voice_part": "bass"
 }
 
+```
+return json
+
+```json
 
 {
     "singer": {
@@ -247,9 +272,27 @@ example input json body
 
 ```
 
+***POST /singer***
+* this endpoint allows singers to register to signer table
+* needs 'post:singers'
 
+example body json
+```json
+{
+    "name": "Michael Scott",
+    "phone": "123-123-1234",
+    "voice_part": "tenor",
+    "not_available": "Thursday"
+}
+```
 
-
+json return
+```json
+{
+    "singer added": "Michael Scott added",
+    "success": true
+}
+```
 
 
 
