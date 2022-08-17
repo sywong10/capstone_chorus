@@ -162,7 +162,90 @@ http://localhost:5000 <br>
 
 
 **GET /singers**
+* fetch registered singer list 
+* need 'get:singers' permission
+* returns: json containing all info in singer table.
 
+```json
+GET /singers
+
+{
+    "singers": [
+        {
+            "id": 1,
+            "name": "Jane Doe",
+            "not_avilable": "Thursday",
+            "phone": "111-111-1111",
+            "voice_part": "alto"
+        },
+        {
+            "id": 2,
+            "name": "Leslie Knope",
+            "not_avilable": "Tuesday",
+            "phone": "131-111-1111",
+            "voice_part": "soprano"
+        },
+        ...
+}
+```
+
+
+**GET /singers/<voice_type>**
+* fetch names of specified voice type among registered singers.
+* needs 'get:singers'
+* the endpoint returns 10 singers a page.
+* query an incorrect voice type will return error 422
+
+```json
+GET /singers/soprano
+
+{
+    "soprano": [
+        "Leslie Knope",
+        "Ann Perkins",
+        "Angela Martin"
+    ],
+    "success": true,
+    "total": 3
+}
+
+
+GET /singers/baritone
+
+{
+    "error": 422,
+    "message": "unprocessable_entity",
+    "success": false
+}
+
+```
+
+***PATCH /singer/<int:singer_id>***
+
+* update information of an existing singer
+* the endpoint returns json object of the updated singer
+
+example input json body
+
+```json
+
+{
+    "voice_part": "bass"
+}
+
+
+{
+    "singer": {
+        "id": 10,
+        "name": "Chris Traeger",
+        "not_avilable": "Thursday",
+        "phone": "132-253-7831",
+        "voice_part": "bass"
+    },
+    "success": true
+}
+
+```
 
 
 
@@ -182,7 +265,7 @@ sywong109@gmail.com
 Hoboken10!
 
 https://sywong10chorus.us.auth0.com/authorize?audience=chorus&response_type=token&client_id=taUeqV5y7Egh7g6Kf9P57j2zTDpLucmU&redirect_uri=https://localhost:8080/login-result
-https://localhost:8080/login-result#access_token=eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjQ5NVJqMVUwdUd0NFJvcjI1VGtpRiJ9.eyJpc3MiOiJodHRwczovL3N5d29uZzEwY2hvcnVzLnVzLmF1dGgwLmNvbS8iLCJzdWIiOiJhdXRoMHw2MmRjNmNiN2U1MThlYmI2Nzc1ZWIyMWYiLCJhdWQiOiJjaG9ydXMiLCJpYXQiOjE2NjA1ODU3ODIsImV4cCI6MTY2MDY3MjE4MiwiYXpwIjoidGFVZXFWNXk3RWdoN2c2S2Y5UDU3ajJ6VERwTHVjbVUiLCJzY29wZSI6IiIsInBlcm1pc3Npb25zIjpbImRlbGV0ZTpjaG9pcnMiLCJkZWxldGU6c2luZ2VycyIsImdldDpjaG9pcnMiLCJnZXQ6ZW5yb2xsbWVudHMiLCJnZXQ6cGFydCIsImdldDpwYXJ0X2luX2Nob2lyIiwiZ2V0OnNpbmdlcnMiLCJwYXRjaDpjaG9pcnMiLCJwYXRjaDpzaW5nZXJzIiwicG9zdDpjaG9pcnMiLCJwb3N0OmVucm9sbF9zaW5nZXIiLCJwb3N0OnNpbmdlcnMiXX0.OAeprtMFR1RiUWWCoc6Tqp0fkdTgYKm3qP7kJmDi4hhPMivOGYV4XgtH6jpfpsHqX3-8DQTMI3vQ6EvQyqVi2mXZN8oqzz7fs368oZ9UqvPnBAUI1O518bOb_JrUHsuLHmiCkKeykqUkOQd-R4L4uDA98QYd08w_1vzAIjwCBaOMeUHiw-IhzNKPVAJWINh9tofhi3ljMXnFYndHMPTZm5z7upimriDsWdws7boSjRMzXPPC-yNF80ygfwM2vsFAvZCs0QW9L6nHe1UG9l4YQQeYpX_thzbdzzPXr8huxCDWDFZXd4tFOt5yLBkgogFI02a2QeB4PsFdEx4Anf_VPg&expires_in=86400&token_type=Bearer
+https://localhost:8080/login-result#access_token=eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjQ5NVJqMVUwdUd0NFJvcjI1VGtpRiJ9.eyJpc3MiOiJodHRwczovL3N5d29uZzEwY2hvcnVzLnVzLmF1dGgwLmNvbS8iLCJzdWIiOiJhdXRoMHw2MmRjNmNiN2U1MThlYmI2Nzc1ZWIyMWYiLCJhdWQiOiJjaG9ydXMiLCJpYXQiOjE2NjA2OTgzMzQsImV4cCI6MTY2MDc4NDczNCwiYXpwIjoidGFVZXFWNXk3RWdoN2c2S2Y5UDU3ajJ6VERwTHVjbVUiLCJzY29wZSI6IiIsInBlcm1pc3Npb25zIjpbImRlbGV0ZTpjaG9pcnMiLCJkZWxldGU6c2luZ2VycyIsImdldDpjaG9pcnMiLCJnZXQ6ZW5yb2xsbWVudHMiLCJnZXQ6cGFydCIsImdldDpwYXJ0X2luX2Nob2lyIiwiZ2V0OnNpbmdlcnMiLCJwYXRjaDpjaG9pcnMiLCJwYXRjaDpzaW5nZXJzIiwicG9zdDpjaG9pcnMiLCJwb3N0OmVucm9sbF9zaW5nZXIiLCJwb3N0OnNpbmdlcnMiXX0.MTURpRwwni-FN3xvQ7hWma2HC0sfPSkUekPVz3bHBK5mTT-aERu7xsVgfySzwA87kTWPqmSwk4V5ZHbpfT4j1O2nV9eGsimg8aV_qExQAYnK4C_g5G5VQun-TJXnlQsSZ5wQj4X8ntZDBZynlK6ilxloFv2zVoTFOQm8nLE-q3-MRdJFJapcwwx4u0ll3t-4JLSuXnYfugrqqf65zAaTrN3KAu0QJ-7hrvY8sQKH_m2W3yHK1m91phdlLQ6dlLOrnAvqut-gIEtGhgxgnd_6eHOWsEMedFEDdfE-svewMwdRcs3ewPSDg4lCagTyRSpfpYmXDe-LPaM9MN78vH8nug&expires_in=86400&token_type=Bearer
 
 
 singer

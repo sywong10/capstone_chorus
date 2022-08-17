@@ -4,7 +4,7 @@ from flask_cors import CORS
 from models import setup_db, db, Singer, Choir, ChoirEnrollment
 from auth import AuthError, requires_auth
 
-NUMBER_PER_PAGE = 3
+NUMBER_PER_PAGE = 10
 
 def pagination(request, selection):
     # print(type(selection))
