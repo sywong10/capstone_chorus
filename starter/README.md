@@ -166,8 +166,8 @@ http://localhost:5000 <br>
 * need 'get:singers' permission
 * returns: json containing all info in singer table.
 
-```json
 GET /singers
+```json
 
 {
     "singers": [
@@ -184,8 +184,7 @@ GET /singers
             "not_avilable": "Tuesday",
             "phone": "131-111-1111",
             "voice_part": "soprano"
-        },
-        ...
+        }
 }
 ```
 
