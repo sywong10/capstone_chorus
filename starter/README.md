@@ -294,6 +294,155 @@ json return
 }
 ```
 
+***DELETE /singers/<int:singer_id>***
+* this endpoint delete specified singer from singer table
+* requires 'delete:singers'
+* this endpoint first checks if specified singer is enrolled in a choir.  If no, the endpoint will delete the singer.  If the singer is already enrolled to a choir, yes, the endpoint will unenroll, then delete.
+* the endpoint returns return code and deleted singer name.
+
+DELETE /singers/17
+
+```json
+
+{
+    "deleted singer": {
+        "id": 17,
+        "name": "Michael Scott",
+        "voice_part": "tenor"
+    },
+    "success": true
+}
+```
+
+***GET /choirs***
+* this endpoint queries available choirs in the area
+* needs 'get:choirs' permission
+* the return contains information of each choir in the area
+
+```json
+
+{
+    "choirs": [
+        {
+            "id": 1,
+            "name": "Hudson Choir",
+            "practice time": "Tuesday 7 pm"
+        },
+        {
+            "id": 2,
+            "name": "Bergen Choir",
+            "practice time": "Tuesday 7 pm"
+        },
+        {
+            "id": 3,
+            "name": "Mercer Choir",
+            "practice time": "Thursday 7 pm"
+        }
+    ],
+    "success": true
+}
+```
+
+***POST /choirs***
+* this endpoint add a new choir
+* needs 'post:choirs' permission
+* the endpoint returns json of added choir
+
+POST /choirs
+
+Body
+```json
+{
+    "name": "Somerset Choir2",
+    "practice_time": "Wednesday 7 pm"
+}
+```
+
+json retun
+
+```json
+{
+    "choir added": "Somerset Choir2",
+    "success": true
+}
+```
+
+***PATCH /choirs/<int:choir_id>***
+* this endpoint update specified choir
+* needs 'patch:choirs'
+* the endpoint returns updated choir and information
+
+PATCH /choirs/4
+
+```json
+
+{
+    "success": true,
+    "updated choir": {
+        "id": 4,
+        "name": "Somerset Choir2",
+        "practice time": "Friday 7 pm"
+    }
+}
+
+```
+
+***DELETE /choirs/<int:choir_id>
+* this endpoint deletes specified choir
+* needs 'delete:choirs'
+* it returns information of deleted choir
+
+```json
+
+{
+    "removed choir": {
+        "id": 4,
+        "name": "Somerset Choir2",
+        "practice time": "Friday 7 pm"
+    },
+    "success": true
+}
+
+```
+
+***POST /enroll/<choir name>/<int:singer_id>***
+* enroll specified singer to choir
+* need 'post:enroll_singer'
+* the endpoint checks which day the sinter is not available and enrolls the singer to specified choir when there is no schedule conflict. 
+* the endpoint return json of singer name and the choir he or she is enrolled to.
+
+
+POST /enroll/hudson/18
+
+```json
+{
+    "singer added": "Michael Scott",
+    "success": true,
+    "updated choir": "Hudson Choir"
+}
+```
+
+***GET /choir/<choir_id>/<voice_type>***
+* this endpoint queries specified voice type in the choir
+* need 'get:choirs'
+* this endpoint returns json of list of name of the voice type in this choir.
+
+GET /choir/1/tenor
+
+```json
+{
+    "Choir name": "Hudson Choir",
+    "success": true,
+    "tenor": [
+        "Mark Brendanawicz",
+        "Ben Wyatt",
+        "Craig Middleborooks",
+        "Jim Halpert",
+        "Michael Scott"
+    ]
+}
+```
+
 
 
 
