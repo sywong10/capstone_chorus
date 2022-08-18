@@ -15,6 +15,8 @@ Flask-Moment
 Flask-WTF
 Babel
 python-dateutil
-Flask-Migrate
 dotenv
 python-jose
+Flask-Script==2.0.6
+Flask-Migrate==2.7.0
+
