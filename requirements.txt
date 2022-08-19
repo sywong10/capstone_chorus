@@ -4,12 +4,12 @@ colorama==0.4.4
 Flask==1.1.2
 Flask-SQLAlchemy==2.5.1
 greenlet==1.1.2
-itsdangerous
-Jinja2
+itsdangerous==2.0.1
+Jinja2==3.0.3
 MarkupSafe==2.0.1
 psycopg2==2.9.2
 SQLAlchemy==1.4.28
-Werkzeug
+Werkzeug==2.0.3
 wincertstore==0.2
 Flask-Moment
 Flask-WTF
