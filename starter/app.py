@@ -53,11 +53,11 @@ def create_app(test_config=None):
         return response
 
 
-    # @app.route('/')
-    # def index():
-    #     return 'hello'
+    @app.route('/')
+    def index():
+        return 'Chorus app'
 
-    # test completed
+
     @app.route('/singers', methods=['GET'])
     @requires_auth('get:singers')
     def get_paginated_singers(jwt):
@@ -75,7 +75,7 @@ def create_app(test_config=None):
         else:
             abort(404)
 
-    # test completed
+
     @app.route('/singers/<int:singer_id>', methods=['GET'])
     @requires_auth('get:singers')
     def get_specific_singer(jwt, singer_id):
@@ -91,8 +91,7 @@ def create_app(test_config=None):
             abort(404)
 
 
-    # add a new singer
-    # tests completed
+
     @app.route('/singers', methods=['POST'])
     @requires_auth('post:singers')
     def add_singers(jwt):
@@ -138,7 +137,7 @@ def create_app(test_config=None):
     # get list of singer in specified voice part
     # return of this function does not take enrollment into consideration
 
-    # test completed
+
     @app.route('/singers/<voice_part>', methods=['GET'])
     @requires_auth('get:singers')
     def get_voice_type(jwt, voice_part):
@@ -160,7 +159,7 @@ def create_app(test_config=None):
 
 
 
-    # test completed
+
     @app.route('/singers/<int:id>', methods=['PATCH'])
     @requires_auth('patch:singers')
     def modify_singer(jwt, id):
@@ -192,7 +191,7 @@ def create_app(test_config=None):
 
 
 
-    # test completed
+
     @app.route('/singers/<int:id>', methods=['DELETE'])
     @requires_auth('delete:singers')
     def delete_singer(jwt, id):
@@ -223,7 +222,7 @@ def create_app(test_config=None):
 
 
 
-    # test completed
+
     @app.route('/choirs', methods=['GET'])
     @requires_auth('get:choirs')
     def get_choirs(jwt):
@@ -240,7 +239,7 @@ def create_app(test_config=None):
             abort(422)
 
 
-    # test is completed
+
     @app.route('/choirs', methods=['POST'])
     @requires_auth('post:choirs')
     def add_choir(jwt):
@@ -271,7 +270,7 @@ def create_app(test_config=None):
             print(e)
             abort(422)
 
-    # test is completed
+
     @app.route('/choirs/<int:id>', methods=['PATCH'])
     @requires_auth('patch:choirs')
     def update_choir(jwt, id):
@@ -302,7 +301,7 @@ def create_app(test_config=None):
 
 
 
-    # test is completed
+
     @app.route('/choirs/<int:id>', methods=['DELETE'])
     @requires_auth('delete:choirs')
     def delete_choir(jwt, id):
@@ -322,8 +321,7 @@ def create_app(test_config=None):
 
 
 
-     # test is completed
-     # who is in which choir, pass in choir id
+
     @app.route('/choir/<int:cid>', methods=['GET'])
     @requires_auth('get:choirs')
     def list_singers_in_choir(jwt, cid):
@@ -348,8 +346,7 @@ def create_app(test_config=None):
 
 
 
-    # test completed
-    #  query the enrolled singers and their voice part in specific choir
+
     @app.route('/choir/<int:cid>/<s_voice_part>', methods=['GET'])
     @requires_auth('get:choirs')
     def choir_id_soprano(jwt, cid, s_voice_part):
@@ -382,17 +379,12 @@ def create_app(test_config=None):
         if not singer:
             abort(404)
 
-        # print('days singer not available: {}'.format(singer.not_available.split()))
-        # print('choir practice time: {}'.format(choir.practice_time))
-
-
         if choir.practice_time.split(' ')[0].lower() in singer.not_available.lower():
             # print('there is a conflict')
             abort(409)
 
         else:
             # print('there is no conflict, good to go')
-
             enrollment = ChoirEnrollment(
                 choir_id=choir.id,
                 singer_id=singer.id,
